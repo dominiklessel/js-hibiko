@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html lang="de-DE">
+  <head>
+    <meta charset="UTF-8">
+    <title>Popup :: Cross Origin Communication</title>
+    <style type="text/css">
+      * { margin:0;border:0;padding:0; }
+      #content-frame { width:900px;height:650px; }
+    </style>
+  </head>
+  <body>
+    <iframe id="content-frame" src="http://domain-b.de/coc/content.html" frameborder="0"></iframe>
+    <script src="js/coc.js"></script>
+    <script>
+      (function() {
+        // set parent location as hash
+        document.getElementById("content-frame").src = document.getElementById("content-frame").src + '#' + encodeURIComponent(document.location.href);
+        // attach event listener
+        COC.receiveMessage( function( message ) {
+          // process message
+          COC.processMessage( message, { "http://domain-b.de" : { "allowed" : true } } );
+          // close popup
+          window.close();
+        }, 'http://domain-b.de' );
+      })();
+    </script>
+  </body>
+</html>

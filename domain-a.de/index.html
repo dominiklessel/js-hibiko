@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html lang="de-DE">
+  <head>
+    <meta charset="UTF-8">
+    <title>Index :: Cross Origin Communication</title>
+  </head>
+  <body>
+    <h1>Cross Origin Communication</h1>
+    <a href="javascript:openPopup( 'popup.html', 900, 654 );">Open popup</a>
+    <script>
+      var popupWindow;
+      var openPopup = function( url, width, heigth ) {
+        popupWindow = window.open( url, '', 'height='+heigth+',width='+width );
+        if ( window.focus ) {
+          popupWindow.focus();
+        }
+      }
+    </script>
+  </body>
+</html>

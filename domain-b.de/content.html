@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html lang="de-DE">
+  <head>
+    <meta charset="UTF-8">
+    <title>Popup Content :: Cross Origin Communication</title>
+  </head>
+  <body>
+    <div>
+      Foreign origin content ...
+    </div>
+    <a href="javascript:close();">Close</a>
+    <script src="js/coc.js"></script>
+    <script>
+      var close = function() {
+        // get parent location
+        var parentUrl = decodeURIComponent( document.location.hash.replace(/^#/, '') );
+        // post message
+        COC.postMessage('location=http://domain-a.de/coc/?success=true', parentUrl, parent);
+      }
+    </script>
+  </body>
+</html>
