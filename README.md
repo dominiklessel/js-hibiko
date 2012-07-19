@@ -1,9 +1,9 @@
 # Cross Origin Communication
 
-## Setup
-`domain-a.de/index.html` öffnet `domain-a.de/popup.html` und lädt `domain-b.de/content.html` in einem Iframe. Die Seite im Iframe hat die Möglichkeit das Popup trotz SOP zu manipulieren.
+## Scenario
+`domain-a.de/index.html` opens `domain-a.de/popup.html` and loads `domain-b.de/content.html` into an iframe. The Content inside the iframe is allowed to send messages back to the popup, which can then manipulate the index page.
 
-## Kompatibilität
+## Compatibility
 
 * FF3+
 * Chrome
