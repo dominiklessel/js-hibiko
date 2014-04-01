@@ -1,4 +1,4 @@
-# Hibiko
+# WIP: Hibiko
 
 JS cross origin communication made simple.
 
