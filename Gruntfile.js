@@ -17,6 +17,17 @@ module.exports = function(grunt) {
       ' */',
       ''
     ].join('\n'),
+    express: {
+      devA: { options: { script: 'examples/server.js', node_env: 'devA' } },
+      devB: { options: { script: 'examples/server.js', node_env: 'devB' } },
+    },
+    open: {
+      devA: { path: 'http://127.0.0.1:3000', app: 'Google Chrome' },
+      devB: { path: 'http://127.0.0.1:3001', app: 'Google Chrome' }
+    },
+    concurrent: {
+      server: ['express:devA', 'express:devB', 'open:devA'],
+    },
     concat: {
       options: {
         banner: '<%= banner %>',
@@ -68,6 +79,9 @@ module.exports = function(grunt) {
   });
 
   // These plugins provide necessary tasks.
+  grunt.loadNpmTasks('grunt-open');
+  grunt.loadNpmTasks('grunt-concurrent');
+  grunt.loadNpmTasks('grunt-express-server');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -76,5 +90,6 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'clean', 'concat', 'uglify']);
+  grunt.registerTask('server', ['concurrent:server']);
 
 };
