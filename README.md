@@ -14,7 +14,7 @@ JS cross origin communication between iFrames made simple.
 	
 ## Example
 
-** Server A **  
+**Server A**  
 
 ```
 <!DOCTYPE HTML>
@@ -62,7 +62,7 @@ JS cross origin communication between iFrames made simple.
 
 ```
 
-** Server B **  
+**Server B**  
 
 ```
 <!DOCTYPE HTML>
