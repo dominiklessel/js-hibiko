@@ -26,7 +26,7 @@ module.exports = function(grunt) {
       devB: { path: 'http://127.0.0.1:3001', app: 'Google Chrome' }
     },
     concurrent: {
-      server: ['express:devA', 'express:devB', 'open:devA'],
+      servers: ['express:devA', 'express:devB'],
     },
     concat: {
       options: {
@@ -69,12 +69,6 @@ module.exports = function(grunt) {
       gruntfile: {
         src: 'Gruntfile.js'
       }
-    },
-    watch: {
-      gruntfile: {
-        files: '<%= jshint.gruntfile.src %>',
-        tasks: ['jshint:gruntfile']
-      }
     }
   });
 
@@ -90,6 +84,6 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'clean', 'concat', 'uglify']);
-  grunt.registerTask('server', ['concurrent:server']);
+  grunt.registerTask('server', ['open:devA', 'concurrent:servers']);
 
 };

@@ -5,92 +5,156 @@
  * Copyright (c) 2014 
  * Released under the MIT license
  *
- * Date: 2014-04-01
+ * Date: 2014-04-02
  */
 
 var Hibiko = Hibiko || (function( window, document ) {
 
-  var intervalId;
-  var lastHash;
-  var attachedCallback;
-  var originWhitelist = {};
-  var cacheBust = 1;
-
+  var HibikoLib;
   var publicInterface = {};
-  var postMessage;
-  var receiveMessage;
-  var processMessage;
 
-  postMessage = publicInterface.postMessage = function( message, targetUrl, target ) {
 
-    if ( !targetUrl ) {
-      return;
-    }
+  /**
+   * Hibiko Library Object
+   *
+   * @param {window} target         The window object of the target
+   * @param {String} targetOrigin   The origin of the window that sent the message at the time postMessage was called
+   *
+   * @constructor
+   */
 
-    target = target || parent;
+  HibikoLib = function HibikoLib( target, targetOrigin ) {
 
-    if ( !window.postMessage ) {
-      target.location = targetUrl.replace(/#.*$/, '') + '#' + (+new Date()) + (cacheBust++) + '&' + message;
-      return;
-    }
+    this.target = target;
+    this.targetOrigin = targetOrigin;
+    this.rpcs = {};
 
-    target.postMessage(message, targetUrl.replace( /([^:]+:\/\/[^\/]+).*/, '$1'));
-
-  };
-
-  receiveMessage = publicInterface.receiveMessage = function( callback, sourceOrigin ) {
-
-    if ( window.postMessage ) {
-      if ( callback ) {
-        attachedCallback = function( e ) {
-          if ( (typeof sourceOrigin === 'string' && e.origin !== sourceOrigin) || (Object.prototype.toString.call(sourceOrigin) === "[object Function]" && sourceOrigin(e.origin) === !1) ) {
-            return !1;
-          }
-          callback( e );
-        };
-      }
-
-      if ( window.addEventListener ) {
-        window[callback ? 'addEventListener' : 'removeEventListener']('message', attachedCallback, !1);
-      }
-      else {
-        window[callback ? 'attachEvent' : 'detachEvent']('onmessage', attachedCallback);
-      }
-
-      return;
-    }
-
-    if ( intervalId ) {
-      clearInterval( intervalId );
-    }
-
-    intervalId = null;
-
-    if ( callback ) {
-      intervalId = setInterval(function() {
-        var hash = document.location.hash, re = /^#?\d+&/;
-        if ( hash !== lastHash && re.test(hash) ) {
-          lastHash = hash;
-          callback( {data: hash.replace(re, '')} );
-        }
-      }, 100);
-    }
+    this.JSONMessageIdentifier = ';;JSON;;';
+    this.RPCMessageIdentifier = ';;RPC;;';
 
   };
 
-  processMessage = publicInterface.processMessage = function( event, whitelist ) {
 
-    this.originWhitelist = whitelist;
+  /**
+   * Posts a message to the other window (target)
+   *
+   * @param {Object/String} msg   Data to be sent to the other window.
+   *
+   * @public
+   */
 
-    if ( event.origin && ('undefined' === typeof originWhitelist[event.origin] || !originWhitelist[event.origin].allowed) ) {
+  HibikoLib.prototype.postMessage = function( msg ) {
+
+    if ( 'object' === typeof msg && msg.rpName ) {
+      msg = this.RPCMessageIdentifier + JSON.stringify( msg );
+    }
+    else if ( 'object' === typeof msg ) {
+      msg = this.JSONMessageIdentifier + JSON.stringify( msg );
+    }
+
+    this.target.postMessage( msg, this.targetOrigin );
+
+  };
+
+
+  /**
+   * Internal message event handler
+   * !! Not supposed to be used by the outside world.
+   *
+   * @param {Event} e   An message event
+   *
+   * @private
+   */
+
+  HibikoLib.prototype.__onMessage = function( e ) {
+
+    if ( e.origin !== this.targetOrigin ) {
       return;
     }
 
-    if ( event.data.indexOf('location') > -1 ) {
-      window.opener.window.location.href = event.data.split('location=')[1];
+    var msg = e.data;
+
+    if ( msg.indexOf(this.JSONMessageIdentifier) === 0 ) {
+      msg = JSON.parse( msg.replace(this.JSONMessageIdentifier,'') );
+      return this.messageCallback( msg );
     }
 
+    if ( msg.indexOf(this.RPCMessageIdentifier) === 0 ) {
+      msg = JSON.parse( msg.replace(this.RPCMessageIdentifier,'') );
+      if ( !this.rpcs[msg.rpName] ) {
+        return;
+      }
+      return this.rpcs[msg.rpName].apply( null, msg.rpParams );
+    }
+
+    return this.messageCallback( msg );
+
   };
+
+  /**
+   * Lets you register a message handler / callback
+   *
+   * @param {fn} callback   A callback function
+   *
+   * @public
+   */
+
+  HibikoLib.prototype.onMessage = function( callback ) {
+    this.messageCallback = callback;
+    window.addEventListener( 'message', this.__onMessage.bind(this), false );
+  };
+
+
+  /**
+   * Lets you expose a procedure
+   *
+   * @param {String} rpName   Name of the procedure
+   * @param {fn} rpParams     Params of the procedure
+   *
+   * @public
+   */
+
+  HibikoLib.prototype.registerRp = function( rpName, rpFunction ) {
+    this.rpcs[rpName] = rpFunction;
+  };
+
+
+  /**
+   * Lets you call an exposed procedure
+   *
+   * @param {String} rpName   Name of the procedure
+   * @param {fn} rpParams     Params of the procedure
+   *
+   * @public
+   */
+
+  HibikoLib.prototype.callRp = function( rpName, rpParams ) {
+    if ( 'undefined' === typeof rpName || 'undefined' === typeof rpParams ) {
+      return false;
+    }
+    this.postMessage({
+      rpName: rpName,
+      rpParams: rpParams
+    });
+  };
+
+
+  /**
+   * publicInterface.init()
+   *
+   * @param {window} target         The window object of the target
+   * @param {String} targetOrigin   The origin of the window that sent the message at the time postMessage was called
+   * @public
+   */
+
+  publicInterface.init = function( target, targetOrigin ) {
+    return new HibikoLib( target, targetOrigin );
+  };
+
+
+  /**
+   * Export
+   */
 
   return publicInterface;
 

@@ -7,5 +7,19 @@
   <body>
     <h1>Site B</h1>
     <script src="/hibiko.js"></script>
+    <script>
+
+      var target = window.parent;
+
+      var hibiko = Hibiko.init( target, 'http://127.0.0.1:3000' );
+
+      hibiko.onMessage(function( msg ) {
+        console.log( 'Site B - Message:' );
+        console.log( msg );
+        hibiko.postMessage('Site B: How are you?');
+        hibiko.callRp( 'gotInformation', ['foo',2] );
+      });
+
+    </script>
   </body>
 </html>

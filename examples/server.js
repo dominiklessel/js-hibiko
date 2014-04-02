@@ -11,7 +11,7 @@ var express = require('express');
  * Config
  */
 
-var jsFilePath = path.join(__dirname, '..', 'dist', package.main + '-' + package.version + '.js' );
+var jsFilePath = path.join(__dirname, '..', 'lib', package.main + '.js' );
 
 var config = {
   'devA': { port: 3000, template: __dirname + '/devA/index.html' },

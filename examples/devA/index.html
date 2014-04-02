@@ -6,7 +6,37 @@
   </head>
   <body>
     <h1>Site A</h1>
-    <iframe src="http://127.0.0.1:3001/"></iframe>
+    <iframe id="hibikoIframe" src="http://127.0.0.1:3001/"></iframe>
     <script src="/hibiko.js"></script>
+    <script>
+
+      var target = document.getElementById('hibikoIframe');
+
+      target.onload = function() {
+
+        target = (target.contentWindow || target.contentDocument);
+
+        var hibiko = Hibiko.init( target, 'http://127.0.0.1:3001' );
+
+        hibiko.onMessage(function( msg ) {
+          console.log( 'Site A - Message:' );
+          console.log( msg );
+        });
+
+        hibiko.postMessage({
+          'foo': 'bar'
+        });
+
+        var iframeGotInformation = function( foo, bar ) {
+          console.log('Site A - iframeGotInformation:');
+          console.dir( foo );
+          console.dir( bar );
+        };
+
+        hibiko.registerRp( 'gotInformation', iframeGotInformation );
+
+      };
+
+    </script>
   </body>
 </html>
