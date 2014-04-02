@@ -14,6 +14,7 @@ var Hibiko = Hibiko || (function( window, document ) {
   var publicInterface = {};
 
 
+
   /**
    * Hibiko Library Object
    *
@@ -27,8 +28,10 @@ var Hibiko = Hibiko || (function( window, document ) {
 
     this.target = target;
     this.targetOrigin = targetOrigin;
-    this.rpcs = {};
 
+    this.wpmAvailable = typeof window.postMessage !== 'undefined';
+
+    this.rpcs = {};
     this.JSONMessageIdentifier = ';;JSON;;';
     this.RPCMessageIdentifier = ';;RPC;;';
 
@@ -44,6 +47,10 @@ var Hibiko = Hibiko || (function( window, document ) {
    */
 
   HibikoLib.prototype.postMessage = function( msg ) {
+
+    if ( !this.wpmAvailable ) {
+      return;
+    }
 
     if ( 'object' === typeof msg && msg.rpName ) {
       msg = this.RPCMessageIdentifier + JSON.stringify( msg );
@@ -68,7 +75,7 @@ var Hibiko = Hibiko || (function( window, document ) {
 
   HibikoLib.prototype.__onMessage = function( e ) {
 
-    if ( e.origin !== this.targetOrigin ) {
+    if ( !this.wpmAvailable || e.origin !== this.targetOrigin ) {
       return;
     }
 
@@ -100,6 +107,9 @@ var Hibiko = Hibiko || (function( window, document ) {
    */
 
   HibikoLib.prototype.onMessage = function( callback ) {
+    if ( !this.wpmAvailable ) {
+      return;
+    }
     this.messageCallback = callback;
     window.addEventListener( 'message', this.__onMessage.bind(this), false );
   };
@@ -115,6 +125,9 @@ var Hibiko = Hibiko || (function( window, document ) {
    */
 
   HibikoLib.prototype.registerRp = function( rpName, rpFunction ) {
+    if ( !this.wpmAvailable ) {
+      return;
+    }
     this.rpcs[rpName] = rpFunction;
   };
 
@@ -129,7 +142,7 @@ var Hibiko = Hibiko || (function( window, document ) {
    */
 
   HibikoLib.prototype.callRp = function( rpName, rpParams ) {
-    if ( 'undefined' === typeof rpName || 'undefined' === typeof rpParams ) {
+    if ( !this.wpmAvailable || 'undefined' === typeof rpName || 'undefined' === typeof rpParams ) {
       return false;
     }
     this.postMessage({
@@ -148,6 +161,9 @@ var Hibiko = Hibiko || (function( window, document ) {
    */
 
   publicInterface.init = function( target, targetOrigin ) {
+    if ( !window.postMessage ) {
+      return false;
+    }
     return new HibikoLib( target, targetOrigin );
   };
 
