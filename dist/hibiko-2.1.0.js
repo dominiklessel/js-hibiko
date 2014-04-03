@@ -14,6 +14,7 @@ var Hibiko = Hibiko || (function( window, document ) {
   var publicInterface = {};
 
 
+
   /**
    * Hibiko Library Object
    *
