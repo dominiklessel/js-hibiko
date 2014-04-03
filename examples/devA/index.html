@@ -10,13 +10,14 @@
     <script src="/hibiko.js"></script>
     <script>
 
+      var hibiko;
       var target = document.getElementById('hibikoIframe');
 
       target.onload = function() {
 
         target = (target.contentWindow || target.contentDocument);
 
-        var hibiko = Hibiko.init( target, 'http://127.0.0.1:3001' );
+        hibiko = Hibiko.init( target, 'http://127.0.0.1:3001' );
 
         hibiko.onMessage(function( msg ) {
           console.log( 'Site A - Message:' );
