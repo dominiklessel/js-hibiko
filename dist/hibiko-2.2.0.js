@@ -1,5 +1,5 @@
 /*!
- * Hibiko v2.1.1
+ * Hibiko v2.2.0
  * https://mifitto.com
  *
  * Copyright (c) 2014 
@@ -8,11 +8,11 @@
  * Date: 2014-04-03
  */
 
-var Hibiko = Hibiko || (function( window, document ) {
+(function() {
 
+  var root = this;
+  var Hibiko = {};
   var HibikoLib;
-  var publicInterface = {};
-
 
   /**
    * Hibiko Library Object
@@ -153,7 +153,7 @@ var Hibiko = Hibiko || (function( window, document ) {
 
 
   /**
-   * publicInterface.init()
+   * Hibiko.init()
    *
    * @param {window} target         The window object of the target
    * @param {String} targetOrigin   The origin of the window that sent the message at the time postMessage was called
@@ -162,7 +162,7 @@ var Hibiko = Hibiko || (function( window, document ) {
    * @public
    */
 
-  publicInterface.init = function( target, targetOrigin ) {
+  Hibiko.init = function( target, targetOrigin ) {
     if ( !window.postMessage ) {
       return false;
     }
@@ -171,13 +171,13 @@ var Hibiko = Hibiko || (function( window, document ) {
 
 
   /**
-   * publicInterface.inIframe()
+   * Hibiko.inIframe()
    *
    * @returns {Bool}
    * @public
    */
 
-  publicInterface.inIframe = function() {
+  Hibiko.inIframe = function() {
     try {
       return window.self !== window.top;
     }
@@ -191,6 +191,14 @@ var Hibiko = Hibiko || (function( window, document ) {
    * Export
    */
 
-  return publicInterface;
+  if ( 'undefined' !== typeof define && define.amd ) {  // AMD & RequireJS
+    define([], function () { return Hibiko; });
+  }
+  else if ( 'undefined' !== typeof module && module.exports ) { // Node
+    module.exports = Hibiko;
+  }
+  else {
+    root.Hibiko = Hibiko;
+  }
 
-})( window, document );
+})();
