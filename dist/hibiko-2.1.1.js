@@ -1,5 +1,5 @@
 /*!
- * Hibiko v2.1.0
+ * Hibiko v2.1.1
  * https://mifitto.com
  *
  * Copyright (c) 2014 
@@ -12,7 +12,6 @@ var Hibiko = Hibiko || (function( window, document ) {
 
   var HibikoLib;
   var publicInterface = {};
-
 
 
   /**
@@ -34,6 +33,8 @@ var Hibiko = Hibiko || (function( window, document ) {
     this.rpcs = {};
     this.JSONMessageIdentifier = ';;JSON;;';
     this.RPCMessageIdentifier = ';;RPC;;';
+
+    window.addEventListener( 'message', this.__onMessage.bind(this), false );
 
   };
 
@@ -111,7 +112,6 @@ var Hibiko = Hibiko || (function( window, document ) {
       return;
     }
     this.messageCallback = callback;
-    window.addEventListener( 'message', this.__onMessage.bind(this), false );
   };
 
 
