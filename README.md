@@ -6,6 +6,7 @@ JS cross origin communication between iFrames made simple.
 
 * Hibiko
 	* .init( target, targetOrigin )
+  * .inIframe()
 * hibiko
 	* .postMessage( message )
 	* .onMessage( callback )
