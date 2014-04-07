@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "js-hibiko",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "title": "Hibiko",
   "description": "JS cross origin communication made simple",
   "author": "Dominik Lessel <dominik@mifitto.com>",

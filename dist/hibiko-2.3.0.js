@@ -1,11 +1,11 @@
 /*!
- * Hibiko v2.2.0
+ * Hibiko v2.3.0
  * https://mifitto.com
  *
  * Copyright (c) 2014 
  * Released under the MIT license
  *
- * Date: 2014-04-03
+ * Date: 2014-04-07
  */
 
 (function() {
@@ -15,19 +15,41 @@
   var HibikoLib;
 
   /**
+   * Helper
+   *
+   * @param {String/Array} collection
+   * @param {String} target
+   * @returns {Bool}
+   */
+
+  var contains = function( collection, target ) {
+    var foundTarget = false;
+    if ( typeof collection === 'string' ) {
+      return collection.indexOf(target) > -1;
+    }
+    for (var i = collection.length - 1; i >= 0; i--) {
+      if ( collection[i].indexOf(target) > -1 ) {
+        foundTarget = true;
+        break;
+      }
+    }
+    return foundTarget;
+  };
+
+
+  /**
    * Hibiko Library Object
    *
-   * @param {window} target         The window object of the target
-   * @param {String} targetOrigin   The origin of the window that sent the message at the time postMessage was called
+   * @param {window} target                          The window object of the target
+   * @param {String/Array} targetOriginWhitelist     The origin of the window that sent the message at the time postMessage was called
    *
    * @constructor
    */
 
-  HibikoLib = function HibikoLib( target, targetOrigin ) {
+  HibikoLib = function HibikoLib( target, targetOriginWhitelist ) {
 
     this.target = target;
-    this.targetOrigin = targetOrigin;
-
+    this.targetOriginWhitelist = Object.prototype.toString.call( targetOriginWhitelist ) === '[object Array]' ? targetOriginWhitelist : [targetOriginWhitelist];
     this.wpmAvailable = typeof window.postMessage !== 'undefined';
 
     this.rpcs = {};
@@ -60,7 +82,10 @@
       msg = this.JSONMessageIdentifier + JSON.stringify( msg );
     }
 
-    this.target.postMessage( msg, this.targetOrigin );
+    // Broadcast to all whitelisted origins
+    for (var i = this.targetOriginWhitelist.length - 1; i >= 0; i-- ) {
+      this.target.postMessage( msg, this.targetOriginWhitelist[i] );
+    }
 
   };
 
@@ -76,7 +101,7 @@
 
   HibikoLib.prototype.__onMessage = function( e ) {
 
-    if ( !this.wpmAvailable || e.origin !== this.targetOrigin ) {
+    if ( !this.wpmAvailable || !contains(this.targetOriginWhitelist, e.origin) ) {
       return;
     }
 
