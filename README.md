@@ -95,8 +95,7 @@ JS cross origin communication between iFrames made simple.
 
 ## Compatibility
 
-* FF3+
 * Chrome
-* Safari
-* IE7+
-* Opera10+
+* FF3+
+* Safari 4+
+* IE8+
